@@ -9,10 +9,11 @@ export const children: IFieldResolver<any, ApolloContext> = async (
 ) => {
   await validateTokenNode(pgPool, token!, source.id);
 
-  const res = await pgPool.query(
-    "select id, parent_id as parentid, alias from node where parent_id = $1",
-    [source.id]
-  );
+  const sql =
+    "select id, parent_id as parentid, alias from node where parent_id = $1";
+  const values = [source.id];
+  
+  const res = await pgPool.query(sql, values);
 
   return res.rows;
 };

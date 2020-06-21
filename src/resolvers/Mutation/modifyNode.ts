@@ -12,7 +12,8 @@ const sql = (set: string) => `
 update
   node
 set
-  ${set}
+  ${set},
+  modified_at = now()
 where
   id = $1`;
 

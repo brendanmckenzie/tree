@@ -11,10 +11,10 @@ export const property: IFieldResolver<any, ApolloContext, Args> = async (
 ) => {
   await validateTokenProperty(pgPool, token!, id);
 
-  const res = await pgPool.query(
-    "select p.id, p.name from property where id = $1",
-    [id]
-  );
+  const sql = "select p.id, p.name from property where id = $1";
+  const values = [id];
+
+  const res = await pgPool.query(sql, values);
 
   return res.rows;
 };

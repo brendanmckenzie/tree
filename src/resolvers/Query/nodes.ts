@@ -12,24 +12,27 @@ export const nodes: IFieldResolver<any, ApolloContext, Args> = async (
   await validateTokenProperty(pgPool, token!, property);
 
   if (parent === null) {
-    const res = await pgPool.query(
-      "select id, parent_id as parentid, alias from node where property_id = $1 and parent_id is null order by alias",
-      [property]
-    );
+    const sql =
+      "select id, parent_id as parentid, alias from node where property_id = $1 and parent_id is null order by alias";
+    const values = [property];
+
+    const res = await pgPool.query(sql, values);
 
     return res.rows;
   } else if (!parent) {
-    const res = await pgPool.query(
-      "select id, parent_id as parentid, alias from node where property_id = $1 order by alias",
-      [property]
-    );
+    const sql =
+      "select id, parent_id as parentid, alias from node where property_id = $1 order by alias";
+    const values = [property];
+
+    const res = await pgPool.query(sql, values);
 
     return res.rows;
   } else {
-    const res = await pgPool.query(
-      "select id, parent_id as parentid, alias from node where property_id = $1 and parent_id = $2 order by alias",
-      [property, parent]
-    );
+    const sql =
+      "select id, parent_id as parentid, alias from node where property_id = $1 and parent_id = $2 order by alias";
+    const values = [property, parent];
+
+    const res = await pgPool.query(sql, values);
 
     return res.rows;
   }

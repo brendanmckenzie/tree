@@ -8,7 +8,9 @@
     "express-winston": "^4.0.3",
     "graphql": "^15.1.0",
     "graphql-scalars": "^1.1.6",
+    "helmet": "^3.23.1",
     "pg": "^8.2.1",
+    "rate-limiter-flexible": "^2.1.7",
     "winston": "^3.2.1"
   },
   "devDependencies": {

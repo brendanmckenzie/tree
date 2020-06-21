@@ -3,6 +3,7 @@ import { GraphQLJSON, GraphQLGUID, GraphQLDateTime } from "graphql-scalars";
 import { Query } from "./Query";
 import { Mutation } from "./Mutation";
 import { Node } from "./Node";
+import { Property } from "./Property";
 
 export const resolvers: IResolvers = {
   JSON: GraphQLJSON,
@@ -13,4 +14,5 @@ export const resolvers: IResolvers = {
   Mutation,
 
   Node,
+  Property,
 };

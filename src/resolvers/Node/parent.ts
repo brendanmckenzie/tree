@@ -13,10 +13,10 @@ export const parent: IFieldResolver<any, ApolloContext> = async (
 
   await validateTokenNode(pgPool, token!, source.parentid);
 
-  const res = await pgPool.query(
-    "select id, parent_id as parentid, alias from node where id = $1",
-    [source.parentid]
-  );
+  const sql = "select id, parent_id as parentid, alias from node where id = $1";
+  const values = [source.parentid];
+
+  const res = await pgPool.query(sql, values);
 
   return res.rows[0];
 };

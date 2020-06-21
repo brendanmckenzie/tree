@@ -2,9 +2,14 @@ import express from "express";
 import { server } from "./graphql";
 import { banner } from "./banner";
 import { logger } from "./logger";
+import { secure } from "./security";
 
 const app = express();
+app.set("trust proxy", true);
+
 app.use(logger);
+
+secure(app);
 
 server.applyMiddleware({ app });
 
