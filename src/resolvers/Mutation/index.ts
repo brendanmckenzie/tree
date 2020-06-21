@@ -1,13 +1,13 @@
 import { createNode } from "./createNode";
 import { createProperty } from "./createProperty";
 import { createToken } from "./createToken";
+import { modifyContent } from "./modifyContent";
 import { modifyNode } from "./modifyNode";
-import { moveNode } from "./moveNode";
 
 export const Mutation = {
   createNode,
   createProperty,
   createToken,
+  modifyContent,
   modifyNode,
-  moveNode,
 };

@@ -3,6 +3,7 @@ import { gql } from "apollo-server";
 export default gql`
   scalar JSON
   scalar GUID
+  scalar DateTime
 
   type Property {
     "The globally unique identifier of the property"
@@ -20,6 +21,20 @@ export default gql`
     alias: String!
     "The children of the node"
     children: [Node]
+    version(id: GUID): NodeVersion
+    versions: [NodeVersion]
+  }
+
+  type NodeVersion {
+    id: GUID!
+    modified: DateTime!
+    value: JSON!
+  }
+
+  input ModifyNode {
+    parent: GUID
+    alias: String
+    activeVersion: GUID
   }
 
   type Query {
@@ -43,7 +58,7 @@ export default gql`
       parent: GUID
     ): GUID
     "Creates a new property"
-    createProperty("The name of the property" name: String!): GUID
+    createProperty("The name of the property" name: String!): Property
 
     "Creates a new node in a property"
     createNode(
@@ -53,21 +68,16 @@ export default gql`
       alias: String!
       "The parent of the node"
       parent: GUID
-    ): GUID
+    ): Node
 
-    "Renames a node"
+    "Modifies a node"
     modifyNode(
       "The id of the node to modify"
       id: GUID!
-      "The new alias of the node"
-      alias: String!
-    ): GUID
-    "Alters the hierarchy of the specified node"
-    moveNode(
-      "The id of the node to move"
-      id: GUID!
-      "The new parent of the node, or null to move to root"
-      target: GUID
-    ): GUID
+      "The changes to make to the node"
+      input: ModifyNode!
+    ): Node
+
+    modifyContent(node: GUID!, version: GUID, value: JSON!): GUID
   }
 `;

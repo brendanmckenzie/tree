@@ -1,6 +1,7 @@
 import { IFieldResolver, ApolloError } from "apollo-server";
 import { ApolloContext } from "../../context";
 import { validateTokenProperty } from "../../auth";
+import { node } from "../Query/node";
 
 type Args = { property: string; alias: string; parent?: string };
 
@@ -17,7 +18,8 @@ const selectSql =
 export const createNode: IFieldResolver<any, ApolloContext, Args> = async (
   _,
   { property, parent, alias },
-  { pgPool, token }
+  { pgPool, token },
+  info
 ) => {
   await validateTokenProperty(pgPool, token!, property);
 
@@ -25,12 +27,12 @@ export const createNode: IFieldResolver<any, ApolloContext, Args> = async (
 
   const insertRes = await pgPool.query(insertSql, values);
   if (insertRes.rowCount === 1) {
-    return insertRes.rows[0].id;
+    return node(null, { id: insertRes.rows[0].id }, { pgPool, token }, info);
   }
 
   const selectRes = await pgPool.query(selectSql, values);
   if (selectRes.rowCount === 1) {
-    return selectRes.rows[0].id;
+    return node(null, { id: selectRes.rows[0].id }, { pgPool, token }, info);
   }
 
   throw new ApolloError("Query failed", "QUERY_FAIL");

@@ -1,24 +1,52 @@
 import { IFieldResolver, ApolloError } from "apollo-server";
 import { ApolloContext } from "../../context";
 import { validateTokenNode } from "../../auth";
+import { node } from "../Query/node";
 
-type Args = { id: string; alias: string };
+type Args = {
+  id: string;
+  input: { alias: string; parent: string; activeVersion: string };
+};
 
-const sql = `update node set alias = $2 where id = $1`;
+const sql = (set: string) => `
+update
+  node
+set
+  ${set}
+where
+  id = $1`;
 
 export const modifyNode: IFieldResolver<any, ApolloContext, Args> = async (
   _,
-  { id, alias },
-  { pgPool, token }
+  { id, input: { alias, parent, activeVersion } },
+  { pgPool, token },
+  info
 ) => {
   await validateTokenNode(pgPool, token!, id);
 
-  const values = [id, alias];
-
-  const res = await pgPool.query(sql, values);
-  if (res.rowCount === 1) {
-    return id;
+  if (parent) {
+    await validateTokenNode(pgPool, token!, parent);
   }
 
-  throw new ApolloError("Query failed", "QUERY_FAIL");
+  const fields = {
+    alias,
+    parent_id: parent,
+    active_version_id: activeVersion,
+  };
+
+  const changes = Object.keys(fields)
+    .filter((k) => fields[k] !== undefined)
+    .map((key) => ({ key, value: fields[key] }));
+
+  const sqlSet = changes
+    .map(({ key, value }) => (value ? `${key} = '${value}'` : `${key} = null`))
+    .join(", ");
+
+  if (sqlSet) {
+    const values = [id];
+
+    await pgPool.query(sql(sqlSet), values);
+  }
+
+  return node(null, { id }, { pgPool, token }, info);
 };
